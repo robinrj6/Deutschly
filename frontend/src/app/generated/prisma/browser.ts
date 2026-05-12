@@ -27,3 +27,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type Word = Prisma.WordModel
+/**
+ * Model DailySession
+ * 
+ */
+export type DailySession = Prisma.DailySessionModel

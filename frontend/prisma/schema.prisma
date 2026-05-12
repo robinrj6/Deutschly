@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/app/generated/prisma"
 }
 
 datasource db {
@@ -8,29 +8,51 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String?
+  password      String
+  words         Word[]
+  dailySessions DailySession[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([email])
 }
 
 model Word {
   id               Int      @id @default(autoincrement())
-  word             String   @unique
-  article          String
-  plural           String
-  meaning          String
+  userId           Int?
+  word             String
+  article          String   @default("")
+  plural           String   @default("")
+  meaning          String   @default("")
+  partOfSpeech     String   @default("")
   exampleSentences String[] @default([])
-  difficulty       String
   tags             String[] @default([])
+  seenInFlashcard  Boolean  @default(false)
+  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt        DateTime @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime @updatedAt
 
+  @@index([userId])
   @@index([article])
-  @@index([difficulty])
   @@index([word])
+  @@unique([userId, word])
+}
+
+model DailySession {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  date           DateTime
+  generatedCount Int      @default(0)
+  completedCount Int      @default(0)
+  completedAt    DateTime?
+  wordsPayload   Json?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@unique([userId, date])
 }

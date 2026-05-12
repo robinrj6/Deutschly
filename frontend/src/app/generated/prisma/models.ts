@@ -10,4 +10,5 @@
  */
 export type * from './models/User'
 export type * from './models/Word'
+export type * from './models/DailySession'
 export type * from './commonInputTypes'

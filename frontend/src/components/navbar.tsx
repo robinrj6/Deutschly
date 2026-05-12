@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Navbar() {
 	const { data: session, status } = useSession();
@@ -12,7 +12,7 @@ export default function Navbar() {
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-zinc-950/90">
-			<div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+			<div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
 				<Link href="/home" className="text-lg font-semibold tracking-tight">
 					Deutschly
 				</Link>
@@ -31,11 +31,16 @@ export default function Navbar() {
 					<Link href="/home" className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10">
 						Home
 					</Link>
+					{isLoggedIn ? (
+						<Link href="/visited" className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10">
+							Visited
+						</Link>
+					) : null}
 
 					{isLoggedIn ? (
 						<>
 							<div className="hidden max-w-[220px] truncate text-sm text-zinc-600 md:block dark:text-zinc-300">
-								{session?.user?.email ?? session?.user?.name}
+								{session?.user?.name}
 							</div>
 							<button
 								type="button"
@@ -49,16 +54,17 @@ export default function Navbar() {
 						<>
 							<Link
 								href="/login"
-								className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 dark:bg-white dark:text-black"
+								className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
 							>
 								Login
 							</Link>
-							<Link
-								href="/signup"
-								className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
+							<button
+								type="button"
+								onClick={() => signIn(undefined, { callbackUrl: "/home" })}
+								className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 dark:bg-white dark:text-black"
 							>
 								Sign up
-							</Link>
+							</button>
 						</>
 					)}
 				</nav>
@@ -76,9 +82,19 @@ export default function Navbar() {
 						</Link>
 
 						{isLoggedIn ? (
+							<Link
+								href="/visited"
+								className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
+								onClick={() => setMenuOpen(false)}
+							>
+								Visited
+							</Link>
+						) : null}
+
+						{isLoggedIn ? (
 							<>
 								<div className="px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300">
-									{session?.user?.email ?? session?.user?.name}
+									{session?.user?.name}
 								</div>
 								<button
 									type="button"
@@ -92,18 +108,18 @@ export default function Navbar() {
 							<>
 								<Link
 									href="/login"
-									className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 dark:bg-white dark:text-black"
+									className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
 									onClick={() => setMenuOpen(false)}
 								>
 									Login
 								</Link>
-								<Link
-									href="/signup"
-									className="rounded-md px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
-									onClick={() => setMenuOpen(false)}
+								<button
+									type="button"
+									onClick={() => signIn(undefined, { callbackUrl: "/home" })}
+									className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 dark:bg-white dark:text-black"
 								>
 									Sign up
-								</Link>
+								</button>
 							</>
 						)}
 					</div>

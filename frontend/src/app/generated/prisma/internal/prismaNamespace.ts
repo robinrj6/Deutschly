@@ -385,7 +385,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Word: 'Word'
+  Word: 'Word',
+  DailySession: 'DailySession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +402,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "word"
+    modelProps: "user" | "word" | "dailySession"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -553,6 +554,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DailySession: {
+      payload: Prisma.$DailySessionPayload<ExtArgs>
+      fields: Prisma.DailySessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DailySessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DailySessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        findFirst: {
+          args: Prisma.DailySessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DailySessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        findMany: {
+          args: Prisma.DailySessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>[]
+        }
+        create: {
+          args: Prisma.DailySessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        createMany: {
+          args: Prisma.DailySessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DailySessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>[]
+        }
+        delete: {
+          args: Prisma.DailySessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        update: {
+          args: Prisma.DailySessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.DailySessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DailySessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DailySessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.DailySessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DailySessionPayload>
+        }
+        aggregate: {
+          args: Prisma.DailySessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDailySession>
+        }
+        groupBy: {
+          args: Prisma.DailySessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailySessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DailySessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DailySessionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -606,18 +681,35 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const WordScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   word: 'word',
   article: 'article',
   plural: 'plural',
   meaning: 'meaning',
+  partOfSpeech: 'partOfSpeech',
   exampleSentences: 'exampleSentences',
-  difficulty: 'difficulty',
   tags: 'tags',
+  seenInFlashcard: 'seenInFlashcard',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type WordScalarFieldEnum = (typeof WordScalarFieldEnum)[keyof typeof WordScalarFieldEnum]
+
+
+export const DailySessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  generatedCount: 'generatedCount',
+  completedCount: 'completedCount',
+  completedAt: 'completedAt',
+  wordsPayload: 'wordsPayload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailySessionScalarFieldEnum = (typeof DailySessionScalarFieldEnum)[keyof typeof DailySessionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -626,6 +718,14 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -642,6 +742,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -689,6 +798,27 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -817,6 +947,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   word?: Prisma.WordOmit
+  dailySession?: Prisma.DailySessionOmit
 }
 
 /* Types for Logging */

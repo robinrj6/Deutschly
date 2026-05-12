@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import Flashcards from "@/components/flashcards";
+
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
@@ -13,8 +14,8 @@ export default async function HomePage() {
       <div>
         <p className="text-sm uppercase tracking-wide text-zinc-500">Home</p>
         <h1 className="mt-2 text-3xl font-semibold">Welcome{session.user?.name ? `, ${session.user.name}` : ""}</h1>
-        
-        
+        <Flashcards />
+
       </div>
     </main>
   );
