@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Word {
+  id               Int      @id @default(autoincrement())
+  word             String   @unique
+  article          String
+  plural           String
+  meaning          String
+  exampleSentences String[] @default([])
+  difficulty       String
+  tags             String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime
+
+  @@index([article])
+  @@index([difficulty])
+  @@index([word])
+}
