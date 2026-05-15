@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DailyFlashcard } from "@/lib/flashcards/types";
 
 export default function Flashcards() {
@@ -17,6 +17,8 @@ export default function Flashcards() {
     const hasCards = cards.length > 0;
     const activeCard = hasCards ? cards[activeIndex] : null;
     const isLastCard = activeIndex === cards.length - 1;
+    const cardsLeft = cards.length - (activeIndex + 1);
+    const progressPct = cards.length > 0 ? Math.round(((activeIndex + 1) / cards.length) * 100) : 0;
 
     const frontText = useMemo(() => {
         if (!activeCard) return "";
@@ -62,7 +64,14 @@ export default function Flashcards() {
                     }
 
                     if (!cancelled) {
-                        setCards(payload.words ?? []);
+                        const words = payload.words ?? [];
+                        setCards(words);
+                        // Restore saved position
+                        const saved = sessionStorage.getItem("flashcard-index");
+                        if (saved !== null) {
+                            const idx = Number(saved);
+                            if (idx > 0 && idx < words.length) setActiveIndex(idx);
+                        }
                     }
                     return;
                 }
@@ -90,6 +99,7 @@ export default function Flashcards() {
                             word?: DailyFlashcard;
                             words?: DailyFlashcard[];
                             error?: string;
+                            resumed?: boolean;
                         };
 
                         if (event.type === "error") {
@@ -102,8 +112,6 @@ export default function Flashcards() {
 
                             if (!cancelled) {
                                 setCards(nextCards);
-                                setActiveIndex(0);
-                                setIsFlipped(false);
                                 setCompleted(false);
                                 if (nextCards.length === 1) {
                                     setLoading(false);
@@ -113,10 +121,15 @@ export default function Flashcards() {
 
                         if (event.type === "done") {
                             if (!cancelled) {
-                                setCards(event.words ?? nextCards);
-                                setActiveIndex(0);
-                                setIsFlipped(false);
+                                const finalCards = event.words ?? nextCards;
+                                setCards(finalCards);
                                 setCompleted(false);
+                                // Restore saved position on done
+                                const saved = sessionStorage.getItem("flashcard-index");
+                                if (saved !== null) {
+                                    const idx = Number(saved);
+                                    if (idx > 0 && idx < finalCards.length) setActiveIndex(idx);
+                                }
                             }
                         }
                     }
@@ -147,17 +160,35 @@ export default function Flashcards() {
         };
     }, []);
 
-    function goToPrevious() {
+    const goToPrevious = useCallback(() => {
         if (!hasCards) return;
         setIsFlipped(false);
         setActiveIndex((prev) => (prev - 1 + cards.length) % cards.length);
-    }
+    }, [hasCards, cards.length]);
 
-    function goToNext() {
+    const goToNext = useCallback(() => {
         if (!hasCards) return;
         setIsFlipped(false);
         setActiveIndex((prev) => (prev + 1) % cards.length);
-    }
+    }, [hasCards, cards.length]);
+
+    // Persist active index so position is restored on revisit
+    useEffect(() => {
+        if (!loading) sessionStorage.setItem("flashcard-index", String(activeIndex));
+    }, [activeIndex, loading]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        function handleKey(e: KeyboardEvent) {
+            const tag = (e.target as HTMLElement).tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+            if (e.key === "ArrowRight") { e.preventDefault(); goToNext(); }
+            else if (e.key === "ArrowLeft") { e.preventDefault(); goToPrevious(); }
+            else if (e.key === " ") { e.preventDefault(); setIsFlipped((f) => !f); }
+        }
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+    }, [goToNext, goToPrevious]);
 
     async function completeSession() {
         if (!hasCards || completed) return;
@@ -334,7 +365,11 @@ export default function Flashcards() {
                                                         title="Translate sentence"
                                                         aria-label="Translate sentence"
                                                     >
-                                                        ℹ️
+                                                        <img
+                                                            src="../translate.svg"
+                                                            alt="Translate"
+                                                            className={`h-5 w-5 brightness-0 invert ${translatingIndex === idx ? "animate-spin" : ""}`}
+                                                        />
                                                     </div>
                                                 </div>
                                             ))}
@@ -385,91 +420,115 @@ export default function Flashcards() {
 
     return (
         <section className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 py-8">
-            <button
-                type="button"
-                onClick={() => setIsFlipped((prev) => !prev)}
-                className="h-64 w-full max-w-md rounded-2xl text-left"
-                style={{ perspective: "1200px" }}
-                aria-label="Flip flashcard"
-            >
-                <div
-                    className="relative h-full w-full rounded-2xl transition-transform duration-500"
-                    style={{
-                        transformStyle: "preserve-3d",
-                        transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-                    }}
-                >
-                    <div
-                        className="absolute inset-0 flex items-center justify-center rounded-2xl border border-black/10 bg-white p-6 shadow-sm dark:border-white/20 dark:bg-zinc-900"
-                        style={{ backfaceVisibility: "hidden" }}
-                    >
-                        <div className="text-center">
-                            <p className="text-xs uppercase tracking-wide text-zinc-500">Type: {wordTypeLabel}</p>
-                            <p className="mt-2 text-3xl font-semibold">{frontText}</p>
-                        </div>
-                    </div>
-
-                    <div
-                        className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-black/10 bg-black p-6 text-white shadow-sm dark:border-white/20"
-                        style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                    >
-                        <div className="w-full text-center">
-                            <p className="text-xs uppercase tracking-wide text-zinc-300">Back</p>
-                            <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
-                            
-                            {(activeCard?.exampleSentences?.length ?? 0) > 0 && (
-                                <div className="mt-4 space-y-2">
-                                    <p className="text-xs uppercase tracking-wide text-zinc-400">Examples</p>
-                                    {activeCard?.exampleSentences?.map((sentence, idx) => (
-                                        <div key={idx} className="flex items-start gap-2">
-                                            <p className="text-sm text-zinc-200 flex-1">{sentence}</p>
-                                            <div
-                                                role="button"
-                                                tabIndex={0}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    void translateSentence(sentence, idx);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter" || e.key === " ") {
-                                                        e.stopPropagation();
-                                                        void translateSentence(sentence, idx);
-                                                    }
-                                                }}
-                                                className="mt-1 flex-shrink-0 cursor-pointer text-lg hover:opacity-70 disabled:opacity-50 transition-opacity"
-                                                title="Translate sentence"
-                                                aria-label="Translate sentence"
-                                            >
-                                                ℹ️
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            {/* Progress bar */}
+            <div className="w-full max-w-md">
+                <div className="mb-1 flex items-center justify-between text-xs text-zinc-500">
+                    <span>Card {activeIndex + 1} of {cards.length}</span>
+                    <span className="font-medium">
+                        {cardsLeft === 0 ? "Last card! 🎉" : `${cardsLeft} card${cardsLeft === 1 ? "" : "s"} left`}
+                    </span>
                 </div>
-            </button>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                    <div
+                        className="h-full rounded-full bg-black transition-all duration-300 dark:bg-white"
+                        style={{ width: `${progressPct}%` }}
+                    />
+                </div>
+            </div>
 
-            <p className="text-sm text-zinc-500">
-                Card {activeIndex + 1} of {cards.length}
-            </p>
-
-            <div className="flex items-center gap-3">
+            {/* Card row with side arrows */}
+            <div className="flex w-full max-w-xl items-center gap-2">
                 <button
                     type="button"
                     onClick={goToPrevious}
-                    className="rounded-md border border-black/15 px-4 py-2 text-sm hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                    aria-label="Previous card"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-black/15 text-xl transition hover:bg-black/5 active:scale-95 dark:border-white/20 dark:hover:bg-white/10"
                 >
-                    Previous
+                    <img src="../chevron-left.svg" alt="Previous" className="h-4 w-4 brightness-0 invert" /> 
                 </button>
+
+                <button
+                    type="button"
+                    onClick={() => setIsFlipped((prev) => !prev)}
+                    className="h-64 flex-1 rounded-2xl text-left"
+                    style={{ perspective: "1200px" }}
+                    aria-label="Flip flashcard"
+                >
+                    <div
+                        className="relative h-full w-full rounded-2xl transition-transform duration-500"
+                        style={{
+                            transformStyle: "preserve-3d",
+                            transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                        }}
+                    >
+                        <div
+                            className="absolute inset-0 flex items-center justify-center rounded-2xl border border-black/10 bg-white p-6 shadow-sm dark:border-white/20 dark:bg-zinc-900"
+                            style={{ backfaceVisibility: "hidden" }}
+                        >
+                            <div className="text-center">
+                                <p className="text-xs uppercase tracking-wide text-zinc-500">Type: {wordTypeLabel}</p>
+                                <p className="mt-2 text-3xl font-semibold">{frontText}</p>
+                            </div>
+                        </div>
+
+                        <div
+                            className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-black/10 bg-black p-6 text-white shadow-sm dark:border-white/20"
+                            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                        >
+                            <div className="w-full text-center">
+                                <p className="text-xs uppercase tracking-wide text-zinc-300">Meaning</p>
+                                <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
+
+                                {(activeCard?.exampleSentences?.length ?? 0) > 0 && (
+                                    <div className="mt-4 space-y-2">
+                                        <p className="text-xs uppercase tracking-wide text-zinc-400">Examples</p>
+                                        {activeCard?.exampleSentences?.map((sentence, idx) => (
+                                            <div key={idx} className="flex items-start gap-2">
+                                                <p className="text-sm text-zinc-200 flex-1">{sentence}</p>
+                                                <div
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        void translateSentence(sentence, idx);
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter" || e.key === " ") {
+                                                            e.stopPropagation();
+                                                            void translateSentence(sentence, idx);
+                                                        }
+                                                    }}
+                                                    className="mt-1 flex-shrink-0 cursor-pointer text-lg hover:opacity-70 transition-opacity"
+                                                    title="Translate sentence"
+                                                    aria-label="Translate sentence"
+                                                >
+                                                    <img
+                                                        src="../translate.svg"
+                                                        alt="Translate"
+                                                        className={`h-5 w-5 brightness-0 invert ${translatingIndex === idx ? "animate-spin" : ""}`}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </button>
+
                 <button
                     type="button"
                     onClick={goToNext}
-                    className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90 dark:bg-white dark:text-black"
+                    aria-label="Next card"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-black/15 text-xl transition hover:bg-black/5 active:scale-95 dark:border-white/20 dark:hover:bg-white/10"
                 >
-                    Next
+                    <img src="../chevron-right.svg" alt="Next" className="h-4 w-4 brightness-0 invert" />
                 </button>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-3">
                 <button
                     type="button"
                     onClick={replaceCurrentWord}
@@ -478,25 +537,32 @@ export default function Flashcards() {
                 >
                     {replacing ? "Replacing…" : "New word"}
                 </button>
+
+                <button
+                    type="button"
+                    disabled={saving || completed}
+                    onClick={completeSession}
+                    className="rounded-md border border-black/15 px-4 py-2 text-sm disabled:opacity-60 dark:border-white/20"
+                >
+                    {completed ? "Session completed ✓" : saving ? "Saving…" : isLastCard ? "Complete session" : "Complete anyway"}
+                </button>
+
+                <button
+                    type="button"
+                    disabled={saving}
+                    onClick={resetSession}
+                    className="rounded-md border border-red-200/50 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-950/30"
+                >
+                    {saving ? "Clearing…" : "Reset"}
+                </button>
             </div>
 
-            <button
-                type="button"
-                disabled={saving || completed}
-                onClick={completeSession}
-                className="rounded-md border border-black/15 px-4 py-2 text-sm disabled:opacity-60 dark:border-white/20"
-            >
-                {completed ? "Session completed" : saving ? "Saving…" : isLastCard ? "Complete session" : "Complete anyway"}
-            </button>
-
-            <button
-                type="button"
-                disabled={saving}
-                onClick={resetSession}
-                className="rounded-md border border-red-200/50 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-950/30"
-            >
-                {saving ? "Clearing…" : "Clear & new stack"}
-            </button>
+            {/* Keyboard shortcuts footer */}
+            <div className="mt-2 flex items-center gap-4 rounded-xl border border-black/8 bg-zinc-50 px-5 py-2.5 text-xs text-zinc-400 dark:border-white/8 dark:bg-zinc-900/60">
+                <span><kbd className="rounded bg-black/8 px-1.5 py-0.5 font-mono dark:bg-white/10">←</kbd> Prev</span>
+                <span><kbd className="rounded bg-black/8 px-1.5 py-0.5 font-mono dark:bg-white/10">→</kbd> Next</span>
+                <span><kbd className="rounded bg-black/8 px-1.5 py-0.5 font-mono dark:bg-white/10">Space</kbd> Flip</span>
+            </div>
         </section>
     );
 }

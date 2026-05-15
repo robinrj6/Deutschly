@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { DailyFlashcard } from "@/lib/flashcards/types";
+import { generateExamplesWithOllama } from "@/lib/flashcards/ollama";
 import { fetchWordFromWiktapi } from "@/lib/flashcards/wiktapi";
 import { pickRandomWords, randomCount } from "@/lib/flashcards/word-bank";
 
@@ -64,7 +65,28 @@ export async function GET() {
     existingSession.wordsPayload.length >= MIN_DAILY_COUNT &&
     existingSession.wordsPayload.length <= MAX_DAILY_COUNT
   ) {
-    return Response.json({ words: existingSession.wordsPayload, day, resumed: true }, { status: 200 });
+    const resumedWords = existingSession.wordsPayload as DailyFlashcard[];
+    let changed = false;
+
+    for (const card of resumedWords) {
+      if ((card.exampleSentences?.length ?? 0) > 0) continue;
+      if (!card.word || !card.meaning) continue;
+
+      const generated = await generateExamplesWithOllama(card.word, card.meaning);
+      if (generated.length > 0) {
+        card.exampleSentences = generated.slice(0, 2);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      await prisma.dailySession.update({
+        where: { userId_date: { userId, date: day } },
+        data: { wordsPayload: resumedWords },
+      });
+    }
+
+    return Response.json({ words: resumedWords, day, resumed: true }, { status: 200 });
   }
 
   // Fetch user's existing words to avoid duplicates
