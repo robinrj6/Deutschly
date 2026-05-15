@@ -10,7 +10,7 @@ export type ExerciseSourceWord = {
 
 export type FlashcardExercise = {
   id: string;
-  kind: "multiple_choice" | "fill_blank";
+  kind: "multiple_choice" | "fill_blank" | "true_false" | "word_scramble";
   prompt: string;
   question: string;
   options: string[];
@@ -59,6 +59,19 @@ function syntheticPracticeSentence(word: ExerciseSourceWord) {
   return `In dieser Übung passt ${display} gut zum Thema.`;
 }
 
+function scrambleText(value: string) {
+  const chars = value.split("");
+  if (chars.length <= 2) return value;
+
+  for (let i = chars.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  const scrambled = chars.join("");
+  return scrambled.toLowerCase() === value.toLowerCase() ? value.split("").reverse().join("") : scrambled;
+}
+
 function fallbackFillBlank(word: ExerciseSourceWord, index: number): FlashcardExercise {
   const sentence = syntheticPracticeSentence(word);
 
@@ -93,20 +106,69 @@ function fallbackMultipleChoice(word: ExerciseSourceWord, pool: ExerciseSourceWo
   };
 }
 
+function fallbackTrueFalse(word: ExerciseSourceWord, pool: ExerciseSourceWord[], index: number): FlashcardExercise {
+  const useCorrectMeaning = Math.random() > 0.5 || pool.length < 2;
+  const wrongSource = shuffle(pool.filter((item) => item.word !== word.word))[0];
+  const shownMeaning = useCorrectMeaning ? word.meaning : (wrongSource?.meaning ?? word.meaning);
+
+  return {
+    id: makeId("tf", word.word, index),
+    kind: "true_false",
+    prompt: "True or false?",
+    question: `${articlePrefix(word)} means: ${shownMeaning}`,
+    options: ["True", "False"],
+    answer: useCorrectMeaning ? "True" : "False",
+    targetWord: word.word,
+    hint: word.meaning,
+  };
+}
+
+function fallbackWordScramble(word: ExerciseSourceWord, index: number): FlashcardExercise {
+  return {
+    id: makeId("scramble", word.word, index),
+    kind: "word_scramble",
+    prompt: "Unscramble the word.",
+    question: scrambleText(word.word),
+    options: [],
+    answer: word.word,
+    targetWord: word.word,
+    hint: word.meaning,
+  };
+}
+
 function normalizeExercise(input: unknown, index: number): FlashcardExercise | null {
   if (!input || typeof input !== "object") return null;
   const candidate = input as Partial<FlashcardExercise>;
   if (!candidate.targetWord) return null;
   if (!candidate.answer || !candidate.question || !candidate.prompt) return null;
 
-  const kind = candidate.kind === "fill_blank" ? "fill_blank" : "multiple_choice";
+  const kind =
+    candidate.kind === "fill_blank" ||
+    candidate.kind === "true_false" ||
+    candidate.kind === "word_scramble"
+      ? candidate.kind
+      : "multiple_choice";
+
+  const options = Array.isArray(candidate.options)
+    ? candidate.options.filter((item): item is string => typeof item === "string")
+    : [];
+
+  const normalizedOptions = kind === "true_false" && options.length === 0
+    ? ["True", "False"]
+    : options;
+
+  const normalizedAnswer =
+    kind === "true_false"
+      ? (candidate.answer.toLowerCase() === "true" ? "True" : "False")
+      : candidate.answer;
+
   return {
-    id: candidate.id ?? makeId(kind === "fill_blank" ? "fill" : "mc", candidate.targetWord ?? candidate.answer, index),
+    id: candidate.id ?? makeId(kind, candidate.targetWord ?? candidate.answer, index),
     kind,
     prompt: candidate.prompt,
     question: candidate.question,
-    options: Array.isArray(candidate.options) ? candidate.options.filter((item): item is string => typeof item === "string") : [],
-    answer: candidate.answer,
+    options: normalizedOptions,
+    answer: normalizedAnswer,
     targetWord: candidate.targetWord ?? candidate.answer,
     hint: candidate.hint,
     exampleSentence: candidate.exampleSentence,
@@ -119,9 +181,15 @@ export function buildFallbackExercises(words: ExerciseSourceWord[], desiredCount
 
   const exercises: FlashcardExercise[] = [];
   pool.slice(0, desiredCount).forEach((word, index) => {
-    const exercise = index % 2 === 0
-      ? fallbackMultipleChoice(word, pool, index)
-      : fallbackFillBlank(word, index);
+    const mode = index % 4;
+    const exercise =
+      mode === 0
+        ? fallbackMultipleChoice(word, pool, index)
+        : mode === 1
+          ? fallbackFillBlank(word, index)
+          : mode === 2
+            ? fallbackTrueFalse(word, pool, index)
+            : fallbackWordScramble(word, index);
 
     exercises.push(exercise);
   });
@@ -149,9 +217,10 @@ export function parseExercisePayload(payload: string): FlashcardExercise[] {
 }
 
 export function sortExercisesForADHD(exercises: FlashcardExercise[]) {
-  const quick = exercises.filter((item) => item.kind === "multiple_choice");
+  const quick = exercises.filter((item) => item.kind === "multiple_choice" || item.kind === "true_false");
+  const medium = exercises.filter((item) => item.kind === "word_scramble");
   const reflective = exercises.filter((item) => item.kind === "fill_blank");
-  return [...quick, ...reflective];
+  return [...quick, ...medium, ...reflective];
 }
 
 export function toExerciseSources(words: DailyFlashcard[]): ExerciseSourceWord[] {

@@ -5,7 +5,7 @@ import type { DailyFlashcard } from "@/lib/flashcards/types";
 
 type FlashcardExercise = {
     id: string;
-    kind: "multiple_choice" | "fill_blank";
+    kind: "multiple_choice" | "fill_blank" | "true_false" | "word_scramble";
     prompt: string;
     question: string;
     options: string[];
@@ -659,9 +659,9 @@ export default function Flashcards() {
                         <p className="mt-2 text-sm text-zinc-500">Hint: {currentExercise.hint}</p>
                     )}
 
-                    {currentExercise.kind === "multiple_choice" ? (
+                    {currentExercise.kind === "multiple_choice" || currentExercise.kind === "true_false" ? (
                         <div className="mt-4 grid gap-2">
-                            {currentExercise.options.map((option) => {
+                            {(currentExercise.options.length > 0 ? currentExercise.options : ["True", "False"]).map((option) => {
                                 const answered = exerciseResults[currentExercise.targetWord] !== undefined;
                                 const isCorrect = option === currentExercise.answer;
                                 const wasChosenCorrect = answered && exerciseResults[currentExercise.targetWord] && isCorrect;
@@ -697,7 +697,7 @@ export default function Flashcards() {
                                         checkFillBlank();
                                     }
                                 }}
-                                placeholder="Type the missing word"
+                                placeholder={currentExercise.kind === "word_scramble" ? "Type the unscrambled word" : "Type the missing word"}
                                 className="flex-1 rounded-xl border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/40"
                                 disabled={exerciseResults[currentExercise.targetWord] !== undefined}
                             />
