@@ -3,6 +3,23 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DailyFlashcard } from "@/lib/flashcards/types";
 
+type FlashcardExercise = {
+    id: string;
+    kind: "multiple_choice" | "fill_blank";
+    prompt: string;
+    question: string;
+    options: string[];
+    answer: string;
+    targetWord: string;
+    hint?: string;
+    exampleSentence?: string;
+};
+
+type ExerciseResult = {
+    targetWord: string;
+    correct: boolean;
+};
+
 export default function Flashcards() {
     const [cards, setCards] = useState<DailyFlashcard[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -13,6 +30,11 @@ export default function Flashcards() {
     const [error, setError] = useState<string | null>(null);
     const [completed, setCompleted] = useState(false);
     const [translatingIndex, setTranslatingIndex] = useState<number | null>(null);
+    const [exercises, setExercises] = useState<FlashcardExercise[]>([]);
+    const [exerciseIndex, setExerciseIndex] = useState(0);
+    const [exerciseResults, setExerciseResults] = useState<Record<string, boolean>>({});
+    const [exerciseInput, setExerciseInput] = useState("");
+    const [exerciseDone, setExerciseDone] = useState(false);
 
     const hasCards = cards.length > 0;
     const activeCard = hasCards ? cards[activeIndex] : null;
@@ -36,6 +58,74 @@ export default function Flashcards() {
         return lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
     }, [activeCard]);
 
+    const currentExercise = exercises[exerciseIndex] ?? null;
+    const exerciseCompletedCount = Object.keys(exerciseResults).length;
+    const exerciseCorrectCount = Object.values(exerciseResults).filter(Boolean).length;
+    const exerciseProgressPct = exercises.length > 0 ? Math.round((exerciseCompletedCount / exercises.length) * 100) : 0;
+
+    function markExerciseResult(targetWord: string, correct: boolean) {
+        setExerciseResults((current) => ({ ...current, [targetWord]: correct }));
+    }
+
+    function answerMultipleChoice(answer: string) {
+        if (!currentExercise) return;
+        if (exerciseResults[currentExercise.targetWord] !== undefined) return;
+
+        const correct = answer === currentExercise.answer;
+        markExerciseResult(currentExercise.targetWord, correct);
+    }
+
+    function checkFillBlank() {
+        if (!currentExercise) return;
+        if (exerciseResults[currentExercise.targetWord] !== undefined) return;
+
+        const correct = exerciseInput.trim().toLowerCase() === currentExercise.answer.trim().toLowerCase();
+        markExerciseResult(currentExercise.targetWord, correct);
+    }
+
+    function goToNextExercise() {
+        setExerciseInput("");
+        setExerciseIndex((current) => Math.min(current + 1, Math.max(exercises.length - 1, 0)));
+    }
+
+    async function finishExercises() {
+        if (exerciseDone || exercises.length === 0) return;
+
+        setSaving(true);
+        try {
+            const results: ExerciseResult[] = exercises.map((exercise) => ({
+                targetWord: exercise.targetWord,
+                correct: Boolean(exerciseResults[exercise.targetWord]),
+            }));
+
+            await fetch("/api/flashcards/exercises/complete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ results }),
+            });
+
+            setExerciseDone(true);
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "Failed to save exercises.");
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    async function parseJsonResponse<T>(response: Response): Promise<T | null> {
+        const text = await response.text();
+
+        if (!text.trim()) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(text) as T;
+        } catch {
+            return null;
+        }
+    }
+
     useEffect(() => {
         let cancelled = false;
 
@@ -46,6 +136,11 @@ export default function Flashcards() {
             setActiveIndex(0);
             setIsFlipped(false);
             setCompleted(false);
+            setExercises([]);
+            setExerciseIndex(0);
+            setExerciseResults({});
+            setExerciseInput("");
+            setExerciseDone(false);
 
             try {
                 const response = await fetch("/api/flashcards/daily", { method: "GET" });
@@ -58,13 +153,24 @@ export default function Flashcards() {
                 const contentType = response.headers.get("content-type") ?? "";
 
                 if (!response.body || !contentType.includes("application/x-ndjson")) {
-                    const payload = (await response.json()) as { words?: DailyFlashcard[]; error?: string };
+                    const payload = (await response.json()) as {
+                        words?: DailyFlashcard[];
+                        exercises?: FlashcardExercise[];
+                        completed?: boolean;
+                        error?: string;
+                    };
                     if (!response.ok) {
                         throw new Error(payload.error ?? "Failed to load daily flashcards.");
                     }
 
                     if (!cancelled) {
                         const words = payload.words ?? [];
+                        setCompleted(Boolean(payload.completed));
+                        setExercises(payload.exercises ?? []);
+                        setExerciseIndex(0);
+                        setExerciseResults({});
+                        setExerciseInput("");
+                        setExerciseDone(Boolean(payload.completed));
                         setCards(words);
                         // Restore saved position
                         const saved = sessionStorage.getItem("flashcard-index");
@@ -203,13 +309,21 @@ export default function Flashcards() {
                 body: JSON.stringify({ words: cards }),
             });
 
-            const payload = (await response.json()) as { error?: string };
+            const payload = (await parseJsonResponse<{
+                error?: string;
+                exercises?: FlashcardExercise[];
+            }>(response)) ?? {};
 
             if (!response.ok) {
                 throw new Error(payload.error ?? "Failed to complete session.");
             }
 
             setCompleted(true);
+            setExercises(payload.exercises ?? []);
+            setExerciseIndex(0);
+            setExerciseResults({});
+            setExerciseInput("");
+            setExerciseDone(false);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to complete session.");
         } finally {
@@ -264,7 +378,7 @@ export default function Flashcards() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sentence }),
             });
-            const payload = (await response.json()) as { translation?: string; error?: string };
+            const payload = (await parseJsonResponse<{ translation?: string; error?: string }>(response)) ?? {};
             if (response.ok && payload.translation) {
                 alert(`Translation: ${payload.translation}`);
             }
@@ -289,7 +403,7 @@ export default function Flashcards() {
                 headers: { "Content-Type": "application/json" },
             });
 
-            const payload = (await response.json()) as { error?: string };
+            const payload = (await parseJsonResponse<{ error?: string }>(response)) ?? {};
 
             if (!response.ok) {
                 throw new Error(payload.error ?? "Failed to reset session.");
@@ -526,6 +640,99 @@ export default function Flashcards() {
                     <img src="../chevron-right.svg" alt="Next" className="h-4 w-4 brightness-0 invert" />
                 </button>
             </div>
+
+            {completed && exercises.length > 0 && currentExercise && (
+                <section className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/20 dark:bg-zinc-900">
+                    <div className="mb-3 flex items-center justify-between text-xs text-zinc-500">
+                        <span>Quick exercise</span>
+                        <span>{exerciseCompletedCount}/{exercises.length}</span>
+                    </div>
+
+                    <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                        <div className="h-full rounded-full bg-black transition-all dark:bg-white" style={{ width: `${exerciseProgressPct}%` }} />
+                    </div>
+
+                    <p className="text-sm uppercase tracking-wide text-zinc-500">{currentExercise.prompt}</p>
+                    <p className="mt-2 text-lg font-semibold">{currentExercise.question}</p>
+
+                    {currentExercise.hint && (
+                        <p className="mt-2 text-sm text-zinc-500">Hint: {currentExercise.hint}</p>
+                    )}
+
+                    {currentExercise.kind === "multiple_choice" ? (
+                        <div className="mt-4 grid gap-2">
+                            {currentExercise.options.map((option) => {
+                                const answered = exerciseResults[currentExercise.targetWord] !== undefined;
+                                const isCorrect = option === currentExercise.answer;
+                                const wasChosenCorrect = answered && exerciseResults[currentExercise.targetWord] && isCorrect;
+                                const wasChosenWrong = answered && !exerciseResults[currentExercise.targetWord] && option !== currentExercise.answer;
+
+                                return (
+                                    <button
+                                        key={option}
+                                        type="button"
+                                        onClick={() => answerMultipleChoice(option)}
+                                        disabled={answered}
+                                        className={`rounded-xl border px-3 py-2 text-left text-sm transition ${
+                                            wasChosenCorrect
+                                                ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-300"
+                                                : wasChosenWrong
+                                                    ? "border-red-500 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-300"
+                                                    : "border-black/15 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                                        }`}
+                                    >
+                                        {option}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="mt-4 flex gap-2">
+                            <input
+                                type="text"
+                                value={exerciseInput}
+                                onChange={(e) => setExerciseInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        checkFillBlank();
+                                    }
+                                }}
+                                placeholder="Type the missing word"
+                                className="flex-1 rounded-xl border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/40"
+                                disabled={exerciseResults[currentExercise.targetWord] !== undefined}
+                            />
+                            <button
+                                type="button"
+                                onClick={checkFillBlank}
+                                disabled={exerciseResults[currentExercise.targetWord] !== undefined}
+                                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-white dark:text-black"
+                            >
+                                Check
+                            </button>
+                        </div>
+                    )}
+
+                    {exerciseResults[currentExercise.targetWord] !== undefined && (
+                        <div className="mt-3 rounded-xl border border-black/10 bg-zinc-50 px-3 py-2 text-sm dark:border-white/10 dark:bg-white/5">
+                            {exerciseResults[currentExercise.targetWord] ? "Correct ✓" : `Not quite — answer: ${currentExercise.answer}`}
+                        </div>
+                    )}
+
+                    <div className="mt-4 flex items-center justify-between gap-2">
+                        <p className="text-xs text-zinc-500">
+                            Score: {exerciseCorrectCount}/{exerciseCompletedCount}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={exerciseIndex >= exercises.length - 1 ? finishExercises : goToNextExercise}
+                            disabled={exerciseResults[currentExercise.targetWord] === undefined}
+                            className="rounded-xl border border-black/15 px-4 py-2 text-sm disabled:opacity-50 dark:border-white/20"
+                        >
+                            {exerciseIndex >= exercises.length - 1 ? (exerciseDone ? "Exercises saved" : "Finish exercises") : "Next"}
+                        </button>
+                    </div>
+                </section>
+            )}
 
             {/* Action buttons */}
             <div className="flex items-center gap-3">

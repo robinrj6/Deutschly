@@ -70,6 +70,7 @@ export type DailySessionCountAggregateOutputType = {
   completedCount: number
   completedAt: number
   wordsPayload: number
+  exercisesPayload: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -120,6 +121,7 @@ export type DailySessionCountAggregateInputType = {
   completedCount?: true
   completedAt?: true
   wordsPayload?: true
+  exercisesPayload?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -219,6 +221,7 @@ export type DailySessionGroupByOutputType = {
   completedCount: number
   completedAt: Date | null
   wordsPayload: runtime.JsonValue | null
+  exercisesPayload: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: DailySessionCountAggregateOutputType | null
@@ -254,6 +257,7 @@ export type DailySessionWhereInput = {
   completedCount?: Prisma.IntFilter<"DailySession"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"DailySession"> | Date | string | null
   wordsPayload?: Prisma.JsonNullableFilter<"DailySession">
+  exercisesPayload?: Prisma.JsonNullableFilter<"DailySession">
   createdAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -267,6 +271,7 @@ export type DailySessionOrderByWithRelationInput = {
   completedCount?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   wordsPayload?: Prisma.SortOrderInput | Prisma.SortOrder
+  exercisesPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -284,6 +289,7 @@ export type DailySessionWhereUniqueInput = Prisma.AtLeast<{
   completedCount?: Prisma.IntFilter<"DailySession"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"DailySession"> | Date | string | null
   wordsPayload?: Prisma.JsonNullableFilter<"DailySession">
+  exercisesPayload?: Prisma.JsonNullableFilter<"DailySession">
   createdAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -297,6 +303,7 @@ export type DailySessionOrderByWithAggregationInput = {
   completedCount?: Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   wordsPayload?: Prisma.SortOrderInput | Prisma.SortOrder
+  exercisesPayload?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DailySessionCountOrderByAggregateInput
@@ -317,6 +324,7 @@ export type DailySessionScalarWhereWithAggregatesInput = {
   completedCount?: Prisma.IntWithAggregatesFilter<"DailySession"> | number
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"DailySession"> | Date | string | null
   wordsPayload?: Prisma.JsonNullableWithAggregatesFilter<"DailySession">
+  exercisesPayload?: Prisma.JsonNullableWithAggregatesFilter<"DailySession">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DailySession"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DailySession"> | Date | string
 }
@@ -327,6 +335,7 @@ export type DailySessionCreateInput = {
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDailySessionsInput
@@ -340,6 +349,7 @@ export type DailySessionUncheckedCreateInput = {
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -350,6 +360,7 @@ export type DailySessionUpdateInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDailySessionsNestedInput
@@ -363,6 +374,7 @@ export type DailySessionUncheckedUpdateInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -375,6 +387,7 @@ export type DailySessionCreateManyInput = {
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -385,6 +398,7 @@ export type DailySessionUpdateManyMutationInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -397,6 +411,7 @@ export type DailySessionUncheckedUpdateManyInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -424,6 +439,7 @@ export type DailySessionCountOrderByAggregateInput = {
   completedCount?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   wordsPayload?: Prisma.SortOrder
+  exercisesPayload?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -506,16 +522,13 @@ export type DailySessionUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.DailySessionScalarWhereInput | Prisma.DailySessionScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type DailySessionCreateWithoutUserInput = {
   date: Date | string
   generatedCount?: number
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -527,6 +540,7 @@ export type DailySessionUncheckedCreateWithoutUserInput = {
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -568,6 +582,7 @@ export type DailySessionScalarWhereInput = {
   completedCount?: Prisma.IntFilter<"DailySession"> | number
   completedAt?: Prisma.DateTimeNullableFilter<"DailySession"> | Date | string | null
   wordsPayload?: Prisma.JsonNullableFilter<"DailySession">
+  exercisesPayload?: Prisma.JsonNullableFilter<"DailySession">
   createdAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DailySession"> | Date | string
 }
@@ -579,6 +594,7 @@ export type DailySessionCreateManyUserInput = {
   completedCount?: number
   completedAt?: Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -589,6 +605,7 @@ export type DailySessionUpdateWithoutUserInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -600,6 +617,7 @@ export type DailySessionUncheckedUpdateWithoutUserInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -611,6 +629,7 @@ export type DailySessionUncheckedUpdateManyWithoutUserInput = {
   completedCount?: Prisma.IntFieldUpdateOperationsInput | number
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   wordsPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  exercisesPayload?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -625,6 +644,7 @@ export type DailySessionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   completedCount?: boolean
   completedAt?: boolean
   wordsPayload?: boolean
+  exercisesPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -638,6 +658,7 @@ export type DailySessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   completedCount?: boolean
   completedAt?: boolean
   wordsPayload?: boolean
+  exercisesPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -651,6 +672,7 @@ export type DailySessionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   completedCount?: boolean
   completedAt?: boolean
   wordsPayload?: boolean
+  exercisesPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -664,11 +686,12 @@ export type DailySessionSelectScalar = {
   completedCount?: boolean
   completedAt?: boolean
   wordsPayload?: boolean
+  exercisesPayload?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DailySessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "generatedCount" | "completedCount" | "completedAt" | "wordsPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["dailySession"]>
+export type DailySessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "generatedCount" | "completedCount" | "completedAt" | "wordsPayload" | "exercisesPayload" | "createdAt" | "updatedAt", ExtArgs["result"]["dailySession"]>
 export type DailySessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -692,6 +715,7 @@ export type $DailySessionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     completedCount: number
     completedAt: Date | null
     wordsPayload: runtime.JsonValue | null
+    exercisesPayload: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["dailySession"]>
@@ -1125,6 +1149,7 @@ export interface DailySessionFieldRefs {
   readonly completedCount: Prisma.FieldRef<"DailySession", 'Int'>
   readonly completedAt: Prisma.FieldRef<"DailySession", 'DateTime'>
   readonly wordsPayload: Prisma.FieldRef<"DailySession", 'Json'>
+  readonly exercisesPayload: Prisma.FieldRef<"DailySession", 'Json'>
   readonly createdAt: Prisma.FieldRef<"DailySession", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"DailySession", 'DateTime'>
 }

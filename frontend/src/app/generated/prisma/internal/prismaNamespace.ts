@@ -690,6 +690,11 @@ export const WordScalarFieldEnum = {
   exampleSentences: 'exampleSentences',
   tags: 'tags',
   seenInFlashcard: 'seenInFlashcard',
+  repetitionCount: 'repetitionCount',
+  intervalDays: 'intervalDays',
+  easeFactor: 'easeFactor',
+  nextReviewAt: 'nextReviewAt',
+  lastReviewedAt: 'lastReviewedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -705,6 +710,7 @@ export const DailySessionScalarFieldEnum = {
   completedCount: 'completedCount',
   completedAt: 'completedAt',
   wordsPayload: 'wordsPayload',
+  exercisesPayload: 'exercisesPayload',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -809,20 +815,6 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -833,6 +825,20 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 /**

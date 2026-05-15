@@ -95,6 +95,11 @@ export const WordScalarFieldEnum = {
   exampleSentences: 'exampleSentences',
   tags: 'tags',
   seenInFlashcard: 'seenInFlashcard',
+  repetitionCount: 'repetitionCount',
+  intervalDays: 'intervalDays',
+  easeFactor: 'easeFactor',
+  nextReviewAt: 'nextReviewAt',
+  lastReviewedAt: 'lastReviewedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -110,6 +115,7 @@ export const DailySessionScalarFieldEnum = {
   completedCount: 'completedCount',
   completedAt: 'completedAt',
   wordsPayload: 'wordsPayload',
+  exercisesPayload: 'exercisesPayload',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

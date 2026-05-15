@@ -29,11 +29,17 @@ export type AggregateWord = {
 export type WordAvgAggregateOutputType = {
   id: number | null
   userId: number | null
+  repetitionCount: number | null
+  intervalDays: number | null
+  easeFactor: number | null
 }
 
 export type WordSumAggregateOutputType = {
   id: number | null
   userId: number | null
+  repetitionCount: number | null
+  intervalDays: number | null
+  easeFactor: number | null
 }
 
 export type WordMinAggregateOutputType = {
@@ -45,6 +51,11 @@ export type WordMinAggregateOutputType = {
   meaning: string | null
   partOfSpeech: string | null
   seenInFlashcard: boolean | null
+  repetitionCount: number | null
+  intervalDays: number | null
+  easeFactor: number | null
+  nextReviewAt: Date | null
+  lastReviewedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +69,11 @@ export type WordMaxAggregateOutputType = {
   meaning: string | null
   partOfSpeech: string | null
   seenInFlashcard: boolean | null
+  repetitionCount: number | null
+  intervalDays: number | null
+  easeFactor: number | null
+  nextReviewAt: Date | null
+  lastReviewedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -73,6 +89,11 @@ export type WordCountAggregateOutputType = {
   exampleSentences: number
   tags: number
   seenInFlashcard: number
+  repetitionCount: number
+  intervalDays: number
+  easeFactor: number
+  nextReviewAt: number
+  lastReviewedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -82,11 +103,17 @@ export type WordCountAggregateOutputType = {
 export type WordAvgAggregateInputType = {
   id?: true
   userId?: true
+  repetitionCount?: true
+  intervalDays?: true
+  easeFactor?: true
 }
 
 export type WordSumAggregateInputType = {
   id?: true
   userId?: true
+  repetitionCount?: true
+  intervalDays?: true
+  easeFactor?: true
 }
 
 export type WordMinAggregateInputType = {
@@ -98,6 +125,11 @@ export type WordMinAggregateInputType = {
   meaning?: true
   partOfSpeech?: true
   seenInFlashcard?: true
+  repetitionCount?: true
+  intervalDays?: true
+  easeFactor?: true
+  nextReviewAt?: true
+  lastReviewedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -111,6 +143,11 @@ export type WordMaxAggregateInputType = {
   meaning?: true
   partOfSpeech?: true
   seenInFlashcard?: true
+  repetitionCount?: true
+  intervalDays?: true
+  easeFactor?: true
+  nextReviewAt?: true
+  lastReviewedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -126,6 +163,11 @@ export type WordCountAggregateInputType = {
   exampleSentences?: true
   tags?: true
   seenInFlashcard?: true
+  repetitionCount?: true
+  intervalDays?: true
+  easeFactor?: true
+  nextReviewAt?: true
+  lastReviewedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -228,6 +270,11 @@ export type WordGroupByOutputType = {
   exampleSentences: string[]
   tags: string[]
   seenInFlashcard: boolean
+  repetitionCount: number
+  intervalDays: number
+  easeFactor: number
+  nextReviewAt: Date | null
+  lastReviewedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: WordCountAggregateOutputType | null
@@ -266,6 +313,11 @@ export type WordWhereInput = {
   exampleSentences?: Prisma.StringNullableListFilter<"Word">
   tags?: Prisma.StringNullableListFilter<"Word">
   seenInFlashcard?: Prisma.BoolFilter<"Word"> | boolean
+  repetitionCount?: Prisma.IntFilter<"Word"> | number
+  intervalDays?: Prisma.IntFilter<"Word"> | number
+  easeFactor?: Prisma.FloatFilter<"Word"> | number
+  nextReviewAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
+  lastReviewedAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Word"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Word"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -282,6 +334,11 @@ export type WordOrderByWithRelationInput = {
   exampleSentences?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   seenInFlashcard?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
+  nextReviewAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -302,6 +359,11 @@ export type WordWhereUniqueInput = Prisma.AtLeast<{
   exampleSentences?: Prisma.StringNullableListFilter<"Word">
   tags?: Prisma.StringNullableListFilter<"Word">
   seenInFlashcard?: Prisma.BoolFilter<"Word"> | boolean
+  repetitionCount?: Prisma.IntFilter<"Word"> | number
+  intervalDays?: Prisma.IntFilter<"Word"> | number
+  easeFactor?: Prisma.FloatFilter<"Word"> | number
+  nextReviewAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
+  lastReviewedAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Word"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Word"> | Date | string
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -318,6 +380,11 @@ export type WordOrderByWithAggregationInput = {
   exampleSentences?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   seenInFlashcard?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
+  nextReviewAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReviewedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.WordCountOrderByAggregateInput
@@ -341,6 +408,11 @@ export type WordScalarWhereWithAggregatesInput = {
   exampleSentences?: Prisma.StringNullableListFilter<"Word">
   tags?: Prisma.StringNullableListFilter<"Word">
   seenInFlashcard?: Prisma.BoolWithAggregatesFilter<"Word"> | boolean
+  repetitionCount?: Prisma.IntWithAggregatesFilter<"Word"> | number
+  intervalDays?: Prisma.IntWithAggregatesFilter<"Word"> | number
+  easeFactor?: Prisma.FloatWithAggregatesFilter<"Word"> | number
+  nextReviewAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Word"> | Date | string | null
+  lastReviewedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Word"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Word"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Word"> | Date | string
 }
@@ -354,6 +426,11 @@ export type WordCreateInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user?: Prisma.UserCreateNestedOneWithoutWordsInput
@@ -370,6 +447,11 @@ export type WordUncheckedCreateInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -383,6 +465,11 @@ export type WordUpdateInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneWithoutWordsNestedInput
@@ -399,6 +486,11 @@ export type WordUncheckedUpdateInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -414,6 +506,11 @@ export type WordCreateManyInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -427,6 +524,11 @@ export type WordUpdateManyMutationInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -442,6 +544,11 @@ export type WordUncheckedUpdateManyInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -480,6 +587,11 @@ export type WordCountOrderByAggregateInput = {
   exampleSentences?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   seenInFlashcard?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
+  nextReviewAt?: Prisma.SortOrder
+  lastReviewedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -487,6 +599,9 @@ export type WordCountOrderByAggregateInput = {
 export type WordAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
 }
 
 export type WordMaxOrderByAggregateInput = {
@@ -498,6 +613,11 @@ export type WordMaxOrderByAggregateInput = {
   meaning?: Prisma.SortOrder
   partOfSpeech?: Prisma.SortOrder
   seenInFlashcard?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
+  nextReviewAt?: Prisma.SortOrder
+  lastReviewedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -511,6 +631,11 @@ export type WordMinOrderByAggregateInput = {
   meaning?: Prisma.SortOrder
   partOfSpeech?: Prisma.SortOrder
   seenInFlashcard?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
+  nextReviewAt?: Prisma.SortOrder
+  lastReviewedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -518,6 +643,9 @@ export type WordMinOrderByAggregateInput = {
 export type WordSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  repetitionCount?: Prisma.SortOrder
+  intervalDays?: Prisma.SortOrder
+  easeFactor?: Prisma.SortOrder
 }
 
 export type WordCreateNestedManyWithoutUserInput = {
@@ -584,6 +712,18 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -601,6 +741,11 @@ export type WordCreateWithoutUserInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -615,6 +760,11 @@ export type WordUncheckedCreateWithoutUserInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -659,6 +809,11 @@ export type WordScalarWhereInput = {
   exampleSentences?: Prisma.StringNullableListFilter<"Word">
   tags?: Prisma.StringNullableListFilter<"Word">
   seenInFlashcard?: Prisma.BoolFilter<"Word"> | boolean
+  repetitionCount?: Prisma.IntFilter<"Word"> | number
+  intervalDays?: Prisma.IntFilter<"Word"> | number
+  easeFactor?: Prisma.FloatFilter<"Word"> | number
+  nextReviewAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
+  lastReviewedAt?: Prisma.DateTimeNullableFilter<"Word"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Word"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Word"> | Date | string
 }
@@ -673,6 +828,11 @@ export type WordCreateManyUserInput = {
   exampleSentences?: Prisma.WordCreateexampleSentencesInput | string[]
   tags?: Prisma.WordCreatetagsInput | string[]
   seenInFlashcard?: boolean
+  repetitionCount?: number
+  intervalDays?: number
+  easeFactor?: number
+  nextReviewAt?: Date | string | null
+  lastReviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -686,6 +846,11 @@ export type WordUpdateWithoutUserInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -700,6 +865,11 @@ export type WordUncheckedUpdateWithoutUserInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -714,6 +884,11 @@ export type WordUncheckedUpdateManyWithoutUserInput = {
   exampleSentences?: Prisma.WordUpdateexampleSentencesInput | string[]
   tags?: Prisma.WordUpdatetagsInput | string[]
   seenInFlashcard?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  repetitionCount?: Prisma.IntFieldUpdateOperationsInput | number
+  intervalDays?: Prisma.IntFieldUpdateOperationsInput | number
+  easeFactor?: Prisma.FloatFieldUpdateOperationsInput | number
+  nextReviewAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastReviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -731,6 +906,11 @@ export type WordSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   exampleSentences?: boolean
   tags?: boolean
   seenInFlashcard?: boolean
+  repetitionCount?: boolean
+  intervalDays?: boolean
+  easeFactor?: boolean
+  nextReviewAt?: boolean
+  lastReviewedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Word$userArgs<ExtArgs>
@@ -747,6 +927,11 @@ export type WordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   exampleSentences?: boolean
   tags?: boolean
   seenInFlashcard?: boolean
+  repetitionCount?: boolean
+  intervalDays?: boolean
+  easeFactor?: boolean
+  nextReviewAt?: boolean
+  lastReviewedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Word$userArgs<ExtArgs>
@@ -763,6 +948,11 @@ export type WordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   exampleSentences?: boolean
   tags?: boolean
   seenInFlashcard?: boolean
+  repetitionCount?: boolean
+  intervalDays?: boolean
+  easeFactor?: boolean
+  nextReviewAt?: boolean
+  lastReviewedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.Word$userArgs<ExtArgs>
@@ -779,11 +969,16 @@ export type WordSelectScalar = {
   exampleSentences?: boolean
   tags?: boolean
   seenInFlashcard?: boolean
+  repetitionCount?: boolean
+  intervalDays?: boolean
+  easeFactor?: boolean
+  nextReviewAt?: boolean
+  lastReviewedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "word" | "article" | "plural" | "meaning" | "partOfSpeech" | "exampleSentences" | "tags" | "seenInFlashcard" | "createdAt" | "updatedAt", ExtArgs["result"]["word"]>
+export type WordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "word" | "article" | "plural" | "meaning" | "partOfSpeech" | "exampleSentences" | "tags" | "seenInFlashcard" | "repetitionCount" | "intervalDays" | "easeFactor" | "nextReviewAt" | "lastReviewedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["word"]>
 export type WordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Word$userArgs<ExtArgs>
 }
@@ -810,6 +1005,11 @@ export type $WordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     exampleSentences: string[]
     tags: string[]
     seenInFlashcard: boolean
+    repetitionCount: number
+    intervalDays: number
+    easeFactor: number
+    nextReviewAt: Date | null
+    lastReviewedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["word"]>
@@ -1246,6 +1446,11 @@ export interface WordFieldRefs {
   readonly exampleSentences: Prisma.FieldRef<"Word", 'String[]'>
   readonly tags: Prisma.FieldRef<"Word", 'String[]'>
   readonly seenInFlashcard: Prisma.FieldRef<"Word", 'Boolean'>
+  readonly repetitionCount: Prisma.FieldRef<"Word", 'Int'>
+  readonly intervalDays: Prisma.FieldRef<"Word", 'Int'>
+  readonly easeFactor: Prisma.FieldRef<"Word", 'Float'>
+  readonly nextReviewAt: Prisma.FieldRef<"Word", 'DateTime'>
+  readonly lastReviewedAt: Prisma.FieldRef<"Word", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Word", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Word", 'DateTime'>
 }

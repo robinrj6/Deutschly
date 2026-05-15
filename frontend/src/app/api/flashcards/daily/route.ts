@@ -55,8 +55,30 @@ export async function GET() {
     select: {
       completedAt: true,
       wordsPayload: true,
+      exercisesPayload: true,
     },
   });
+
+  if (
+    existingSession &&
+    existingSession.completedAt &&
+    Array.isArray(existingSession.wordsPayload)
+  ) {
+    const resumedWords = existingSession.wordsPayload as DailyFlashcard[];
+
+    return Response.json(
+      {
+        words: resumedWords,
+        exercises: Array.isArray(existingSession.exercisesPayload)
+          ? existingSession.exercisesPayload
+          : [],
+        day,
+        resumed: true,
+        completed: true,
+      },
+      { status: 200 },
+    );
+  }
 
   if (
     existingSession &&

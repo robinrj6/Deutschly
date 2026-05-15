@@ -31,6 +31,11 @@ model Word {
   exampleSentences String[] @default([])
   tags             String[] @default([])
   seenInFlashcard  Boolean  @default(false)
+  repetitionCount  Int      @default(0)
+  intervalDays     Int      @default(0)
+  easeFactor       Float    @default(2.5)
+  nextReviewAt     DateTime?
+  lastReviewedAt   DateTime?
   user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -49,6 +54,7 @@ model DailySession {
   completedCount Int      @default(0)
   completedAt    DateTime?
   wordsPayload   Json?
+  exercisesPayload Json?
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
