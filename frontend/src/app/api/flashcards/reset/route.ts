@@ -11,12 +11,8 @@ export async function POST() {
   }
 
   try {
-    // Delete all words for this user
-    await prisma.word.deleteMany({
-      where: { userId },
-    });
-
-    // Delete today's daily session
+    // Delete today's daily session only.
+    // Keep the user's cumulative word history intact.
     const today = new Date(Date.UTC(
       new Date().getUTCFullYear(),
       new Date().getUTCMonth(),
@@ -30,9 +26,9 @@ export async function POST() {
       },
     });
 
-    return Response.json({ success: true, message: "Cleared all words and today's session" }, { status: 200 });
+    return Response.json({ success: true, message: "Cleared today's session" }, { status: 200 });
   } catch (error) {
-    console.error("Error clearing words:", error);
+    console.error("Error clearing today's session:", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

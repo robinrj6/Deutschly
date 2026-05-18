@@ -228,9 +228,9 @@ export async function fetchWordFromWiktapi(candidate: string): Promise<DailyFlas
 
   if (BLOCKED_POS.has(posSection.pos)) return null;
 
-  const meanings = parseMeanings(posSection.body);
-  const meaning = meanings[0] ?? "";
-  if (!meaning || hasBlockedMeaning(meaning)) return null;
+  const allMeanings = parseMeanings(posSection.body).filter((m) => !hasBlockedMeaning(m));
+  const meaning = allMeanings[0] ?? "";
+  if (!meaning) return null;
 
   let exampleSentences = parseExamples(posSection.body).slice(0, 2);
   
@@ -240,16 +240,12 @@ export async function fetchWordFromWiktapi(candidate: string): Promise<DailyFlas
     exampleSentences = ollamaExamples.slice(0, 2);
   }
 
-  // Final fallback so cards never render without examples.
-  if (exampleSentences.length === 0) {
-    exampleSentences = fallbackExamples(queryWord, posSection.pos);
-  }
-
   return {
     word: queryWord.toLowerCase(),
     article: split.article.toLowerCase(),
     plural: "",
     meaning,
+    meanings: allMeanings,
     pos: posSection.pos,
     exampleSentences,
     tags: [],

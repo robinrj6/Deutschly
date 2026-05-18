@@ -390,7 +390,7 @@ export default function Flashcards() {
     }
 
     async function resetSession() {
-        if (!window.confirm("Clear all words and today's flashcards? This will create a fresh stack.")) {
+        if (!window.confirm("Reset today's flashcards? Your saved word list will be kept.")) {
             return;
         }
 
@@ -454,7 +454,15 @@ export default function Flashcards() {
                             >
                                 <div className="w-full text-center">
                                     <p className="text-xs uppercase tracking-wide text-zinc-300">Back</p>
-                                    <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
+                                    {activeCard?.meanings && activeCard.meanings.length > 1 ? (
+                                      <ol className="mt-2 space-y-1 text-left list-decimal list-inside">
+                                        {activeCard.meanings.map((m, i) => (
+                                          <li key={i} className="text-base font-medium leading-snug">{m}</li>
+                                        ))}
+                                      </ol>
+                                    ) : (
+                                      <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
+                                    )}
                                     
                                     {(activeCard?.exampleSentences?.length ?? 0) > 0 && (
                                         <div className="mt-4 space-y-2">
@@ -591,7 +599,15 @@ export default function Flashcards() {
                         >
                             <div className="w-full text-center">
                                 <p className="text-xs uppercase tracking-wide text-zinc-300">Meaning</p>
-                                <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
+                                {activeCard?.meanings && activeCard.meanings.length > 1 ? (
+                                  <ol className="mt-2 space-y-1 text-left list-decimal list-inside">
+                                    {activeCard.meanings.map((m, i) => (
+                                      <li key={i} className="text-base font-medium leading-snug">{m}</li>
+                                    ))}
+                                  </ol>
+                                ) : (
+                                  <p className="mt-2 text-2xl font-semibold">{activeCard?.meaning || "No meaning"}</p>
+                                )}
 
                                 {(activeCard?.exampleSentences?.length ?? 0) > 0 && (
                                     <div className="mt-4 space-y-2">
@@ -760,7 +776,7 @@ export default function Flashcards() {
                     onClick={resetSession}
                     className="rounded-md border border-red-200/50 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60 dark:border-red-800/50 dark:text-red-400 dark:hover:bg-red-950/30"
                 >
-                    {saving ? "Clearing…" : "Reset"}
+                    {saving ? "Resetting…" : "Reset today"}
                 </button>
             </div>
 

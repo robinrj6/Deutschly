@@ -75,6 +75,7 @@ export async function POST(request: Request) {
         word: card.word,
         article: card.article || "—",
         meaning: card.meaning,
+        meanings: card.meanings,
         pos: card.pos,
         exampleSentences: card.exampleSentences,
         tags: card.tags ?? [],

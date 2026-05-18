@@ -45,7 +45,7 @@ function syntheticPracticeSentence(word: ExerciseSourceWord) {
   const pos = word.pos?.toLowerCase() ?? "";
 
   if (pos === "verb") {
-    return `Wir wollen ${word.word} heute in einer kurzen Übung.`;
+    return `Heute üben wir das Verb ${word.word} in einer kurzen Übung.`;
   }
 
   if (pos === "adjective") {

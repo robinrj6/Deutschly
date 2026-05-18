@@ -17,6 +17,7 @@ function toDayUtc(date = new Date()) {
 function toFlashcard(candidate: {
   word: string;
   meaning: string;
+  meanings?: string[];
   article?: string;
   examples: string[];
   pos?: string;
@@ -30,6 +31,7 @@ function toFlashcard(candidate: {
     word,
     article: candidate.article || "—",
     meaning: candidate.meaning,
+    meanings: candidate.meanings,
     pos,
     exampleSentences: candidate.examples,
     tags: [],
@@ -65,6 +67,24 @@ export async function GET() {
     Array.isArray(existingSession.wordsPayload)
   ) {
     const resumedWords = existingSession.wordsPayload as DailyFlashcard[];
+    let completedChanged = false;
+
+    for (const card of resumedWords) {
+      if (Array.isArray(card.meanings) && card.meanings.length > 0) continue;
+      if (!card.word) continue;
+      const fresh = await fetchWordFromWiktapi(card.word);
+      if (fresh?.meanings && fresh.meanings.length > 0) {
+        card.meanings = fresh.meanings;
+        completedChanged = true;
+      }
+    }
+
+    if (completedChanged) {
+      await prisma.dailySession.update({
+        where: { userId_date: { userId, date: day } },
+        data: { wordsPayload: resumedWords },
+      });
+    }
 
     return Response.json(
       {
@@ -91,13 +111,27 @@ export async function GET() {
     let changed = false;
 
     for (const card of resumedWords) {
-      if ((card.exampleSentences?.length ?? 0) > 0) continue;
-      if (!card.word || !card.meaning) continue;
+      const needsExamples = (card.exampleSentences?.length ?? 0) === 0;
+      const needsMeanings = !Array.isArray(card.meanings) || card.meanings.length === 0;
 
-      const generated = await generateExamplesWithOllama(card.word, card.meaning);
-      if (generated.length > 0) {
-        card.exampleSentences = generated.slice(0, 2);
-        changed = true;
+      if ((needsExamples || needsMeanings) && card.word) {
+        const fresh = await fetchWordFromWiktapi(card.word);
+        if (fresh) {
+          if (needsExamples && fresh.exampleSentences.length > 0) {
+            card.exampleSentences = fresh.exampleSentences.slice(0, 2);
+            changed = true;
+          }
+          if (needsMeanings && fresh.meanings && fresh.meanings.length > 0) {
+            card.meanings = fresh.meanings;
+            changed = true;
+          }
+        } else if (needsExamples) {
+          const generated = await generateExamplesWithOllama(card.word, card.meaning);
+          if (generated.length > 0) {
+            card.exampleSentences = generated.slice(0, 2);
+            changed = true;
+          }
+        }
       }
     }
 
@@ -171,6 +205,7 @@ export async function GET() {
             word: card.word,
             article: card.article,
             meaning: card.meaning,
+            meanings: card.meanings,
             examples: card.exampleSentences,
             pos: card.pos,
           });
